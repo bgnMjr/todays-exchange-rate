@@ -23,10 +23,10 @@ tr:nth-child(even) {
 
 <script>
 window.onload = function() {
-  console.log("Window loaded");
   getRatesAJAX();
 };
 
+// getting exchange rates through AJAX
 function getRatesAJAX() {
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
@@ -38,6 +38,7 @@ function getRatesAJAX() {
   xmlhttp.send();
 }
 
+//sets innerHTML of an element with specified elementId to a string
 function displayInnerHTML(elementId,string) {
   var element = document.getElementById(elementId)
   if (element != null) {
@@ -45,26 +46,32 @@ function displayInnerHTML(elementId,string) {
   }
 }
 
+//Builds a stringOutput with the help of "for in" loop
+//then calls displayInnerHTML() to display stringOutput
 function displayRatesAsTable(json) {
   var currenciesRates = JSON.parse(json);
   var stringOutput = "<table><tr><th>Currency code</th><th>Spot</th></tr>";
 
   for (var key in currenciesRates) {
     if (currenciesRates.hasOwnProperty(key)) {
-        var backgroundColor = "";
+        var outlineColor = "";
         switch (key) {
           case "date": {
+            //date does not belong to the table, so we display it in a
+            //separate element
             displayInnerHTML("date",currenciesRates[key]);
             continue;
           }
           case "USD":
           case "JPY":
-          case "GBP":
-            backgroundColor = "orange";
+          case "GBP": {
+            //highlighting some currencies
+            outlineColor = "orange";
             break;
+          }
         }
-        if (backgroundColor != "") {
-          stringOutput += "<tr style='outline: 2px solid " + backgroundColor + ";'>";
+        if (outlineColor != "") {
+          stringOutput += "<tr style='outline: 2px solid " + outlineColor + ";'>";
         }
         else {stringOutput += "<tr>";}
         stringOutput += "<td>"+key+"</td>";
