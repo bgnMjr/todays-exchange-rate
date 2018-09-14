@@ -2,10 +2,82 @@
 <html lang="en-GB">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=display-width, initial-scale=1.00">
+<meta name="viewport" content="width=device-width, initial-scale=1.00">
 <title>Today's Exchange Rate</title>
+<style>
+table {
+  border-collapse: collapse;
+}
+tr:nth-child(even) {
+  background-color: lightgray;
+}
+</style>
 </head>
 <body>
+<h1>Exchange Rates</h1>
+<p>Data is courtesy of <a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html#dev"
+  target="_blank"> European Central Bank</a>.</p>
+<p><b>All currencies quoted against the euro (base currency)</b></p>
+<p><b>Date of the document:</b> <span id="date">Loading...</span></p>
+<div id="output">Loading...</div>
+
+<script>
+window.onload = function() {
+  console.log("Window loaded");
+  getRatesAJAX();
+};
+
+function getRatesAJAX() {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      displayRatesAsTable(this.responseText);
+    }
+  };
+  xmlhttp.open("POST", "src/getRates.php", true);
+  xmlhttp.send();
+}
+
+function displayInnerHTML(elementId,string) {
+  var element = document.getElementById(elementId)
+  if (element != null) {
+    element.innerHTML = string;
+  }
+}
+
+function displayRatesAsTable(json) {
+  var currenciesRates = JSON.parse(json);
+  var stringOutput = "<table><tr><th>Currency code</th><th>Spot</th></tr>";
+
+  for (var key in currenciesRates) {
+    if (currenciesRates.hasOwnProperty(key)) {
+        var backgroundColor = "";
+        switch (key) {
+          case "date": {
+            displayInnerHTML("date",currenciesRates[key]);
+            continue;
+          }
+          case "USD":
+          case "JPY":
+          case "GBP":
+            backgroundColor = "orange";
+            break;
+        }
+        if (backgroundColor != "") {
+          stringOutput += "<tr style='outline: 2px solid " + backgroundColor + ";'>";
+        }
+        else {stringOutput += "<tr>";}
+        stringOutput += "<td>"+key+"</td>";
+        stringOutput += "<td>" + currenciesRates[key] + "</td>";
+        stringOutput += "</tr>";
+    }
+  }
+
+  stringOutput += "</table>";
+
+  displayInnerHTML("output",stringOutput);
+}
+</script>
 
 </body>
 </html>
